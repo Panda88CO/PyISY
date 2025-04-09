@@ -23,8 +23,6 @@ try:
     logging = udi_interface.LOGGER
     Custom = udi_interface.Custom
     Interface = udi_interface.Interface
-
-
 except ImportError:
     import logging
     logging.basicConfig(level=30)
@@ -49,7 +47,7 @@ else:
     #return False
 
 # Use the helper function to get a new aiohttp.ClientSession.
-websession = get_new_client_session(https, tls_ver)
+websession = get_new_client_session(https, tls_version)
 
 # Connect to ISY controller.
 isy_conn = ISY(
@@ -62,25 +60,13 @@ isy_conn = ISY(
     webroot=host.path,
     websession=websession,
 )
-'''
-try:
-    with async_timeout.timeout(30):
-        isy_conf_xml = await isy_conn.test_connection()
-except (ISYInvalidAuthError, ISYConnectionError):
-    _LOGGER.error(
-        "Failed to connect to the ISY, please adjust settings and try again."
-    )
 
+print(isy_conn)
 
-
-
-_LOGGER = logging.getLogger(__name__)
-
-
-async def main(url, username, password, tls_ver, events, node_servers):
+async def main(url, username, password, tls_ver):
     """Execute connection to ISY and load all system info."""
     _LOGGER.info("Starting PyISY...")
-    t_0 = time.time()
+    t0 = time.time()
     host = urlparse(url)
     if host.scheme == "http":
         https = False
@@ -109,85 +95,27 @@ async def main(url, username, password, tls_ver, events, node_servers):
     )
 
     try:
-        await isy.initialize(node_servers)
+        await isy.initialize()
     except (ISYInvalidAuthError, ISYConnectionError):
-        _LOGGER.exception("Failed to connect to the ISY, please adjust settings and try again.")
+        _LOGGER.error(
+            "Failed to connect to the ISY, please adjust settings and try again."
+        )
         await isy.shutdown()
-        return None
+        return
     except Exception as err:
-        _LOGGER.exception("Unknown error occurred: %s", err.args[0])
+        _LOGGER.error("Unknown error occurred: %s", err.args[0])
         await isy.shutdown()
         raise
 
     # Print a representation of all the Nodes
     _LOGGER.debug(repr(isy.nodes))
-    _LOGGER.info("Total Loading time: %.2fs", time.time() - t_0)
-
-    node_changed_subscriber = None
-    system_status_subscriber = None
-
-    def node_changed_handler(event: NodeChangedEvent) -> None:
-        """Handle a node changed event sent from Nodes class."""
-        (event_desc, _) = NODE_CHANGED_ACTIONS[event.action]
-        _LOGGER.info(
-            "Subscriber--Node %s Changed: %s %s",
-            event.address,
-            event_desc,
-            event.event_info if event.event_info else "",
-        )
-
-    def system_status_handler(event: str) -> None:
-        """Handle a system status changed event sent ISY class."""
-        _LOGGER.info("System Status Changed: %s", SYSTEM_STATUS.get(event))
+    _LOGGER.info("Total Loading time: %.2fs", time.time() - t0)
 
     try:
-        if events:
-            isy.websocket.start()
-            node_changed_subscriber = isy.nodes.status_events.subscribe(node_changed_handler)
-            system_status_subscriber = isy.status_events.subscribe(system_status_handler)
-        await asyncio.Event.wait()
+        isy.websocket.start()
+        while True:
+            await asyncio.sleep(1)
     except asyncio.CancelledError:
         pass
     finally:
-        if node_changed_subscriber:
-            node_changed_subscriber.unsubscribe()
-        if system_status_subscriber:
-            system_status_subscriber.unsubscribe()
         await isy.shutdown()
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(prog=__package__)
-    parser.add_argument("url", type=str)
-    parser.add_argument("username", type=str)
-    parser.add_argument("password", type=str)
-    parser.add_argument("-t", "--tls-ver", dest="tls_ver", type=float)
-    parser.add_argument("-v", "--verbose", action="store_true")
-    parser.add_argument("-q", "--no-events", dest="no_events", action="store_true")
-    parser.add_argument("-n", "--node-servers", dest="node_servers", action="store_true")
-    parser.set_defaults(use_https=False, tls_ver=1.1, verbose=False)
-    args = parser.parse_args()
-
-    enable_logging(LOG_VERBOSE if args.verbose else logging.DEBUG)
-
-    _LOGGER.info(
-        "ISY URL: %s, username: %s, TLS: %s",
-        args.url,
-        args.username,
-        args.tls_ver,
-    )
-
-    try:
-        asyncio.run(
-            main(
-                url=args.url,
-                username=args.username,
-                password=args.password,
-                tls_ver=args.tls_ver,
-                events=(not args.no_events),
-                node_servers=args.node_servers,
-            )
-        )
-    except KeyboardInterrupt:
-        _LOGGER.warning("KeyboardInterrupt received. Disconnecting!")
-    '''

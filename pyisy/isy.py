@@ -123,7 +123,7 @@ class ISY:
         self.connection_events = EventEmitter()
         self.status_events = EventEmitter()
         self.system_status = SYSTEM_BUSY
-        self.loop = asyncio.get_running_loop()
+        #self.loop = asyncio.get_running_loop()
         self._uuid: str | None = None
 
     async def initialize(self, with_node_servers=False):

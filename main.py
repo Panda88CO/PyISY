@@ -105,37 +105,42 @@ async def main(url, username, password, tls_ver, events, node_servers):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(prog=__package__)
-    parser.add_argument("url", type=str)
-    parser.add_argument("username", type=str)
-    parser.add_argument("password", type=str)
-    parser.add_argument("-t", "--tls-ver", dest="tls_ver", type=float)
-    parser.add_argument("-v", "--verbose", action="store_true")
-    parser.add_argument("-q", "--no-events", dest="no_events", action="store_true")
-    parser.add_argument("-n", "--node-servers", dest="node_servers", action="store_true")
-    parser.set_defaults(use_https=False, tls_ver=1.1, verbose=False)
-    args = parser.parse_args()
+    args = None
+    #parser = argparse.ArgumentParser(prog=__package__)
+    #parser.add_argument("http://192.168.1.204:80", type=str)
+    #parser.add_argument("Panda88", type=str)
+    #parser.add_argument("coe123COE", type=str)
+    #parser.add_argument("-t", "--tls-ver", dest="tls_ver", type=float)
+    #parser.add_argument("-v", "--verbose", action="store_true")
+    #parser.add_argument("-q", "--no-events", dest="no_events", action="store_true")
+    #parser.add_argument("-n", "--node-servers", dest="node_servers", action="store_true")
+    #parser.set_defaults(use_https=False, tls_ver=1.2, verbose=True)
+    #args = parser.parse_args()
+    args_url = 'https://192.168.1.204:80'
+    
+
+
 
     #enable_logging(LOG_VERBOSE if args.verbose else logging.DEBUG)
 
-    _LOGGER.info(
-        "ISY URL: %s, username: %s, TLS: %s",
-        args.url,
-        args.username,
-        args.tls_ver,
-    )
+    #_LOGGER.info(
+    #    "ISY URL: %s, username: %s, TLS: %s",
+    #    args.url,
+    #    args.username,
+    #    args.tls_ver,
+    #)
 
     try:
         asyncio.run(
-            main('https://192.168.1.204:8080', 'Panda88', 'coe123COE' )
-            #main(
-            #    url=args.url,
-            #    username=args.username,
-            #    password=args.password,
-            #    tls_ver=args.tls_ver,
-            #    events=(not args.no_events),
-            #    node_servers=args.node_servers,
-            #)
+            #main('https://192.168.1.204:8080', 'Panda88', 'coe123COE' )
+            main(
+                url=args.url,
+                username=args.username,
+                password=args.password,
+                tls_ver=args.tls_ver,
+                events=(not args.no_events),
+                node_servers=args.node_servers,
+            )
         )
     except KeyboardInterrupt:
         _LOGGER.warning("KeyboardInterrupt received. Disconnecting!")
