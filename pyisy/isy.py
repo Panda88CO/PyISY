@@ -6,7 +6,7 @@ import asyncio
 from threading import Thread
 from xml.dom import minidom
 
-import aiohttp
+
 
 from .clock import Clock
 from .configuration import Configuration
@@ -36,7 +36,7 @@ from .node_servers import NodeServers
 from .nodes import Nodes
 from .programs import Programs
 from .variables import Variables
-
+import aiohttp
 
 class ISY:
     """
