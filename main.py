@@ -68,7 +68,7 @@ async def main(url, username, password, tls_ver, events, node_servers):
         raise
 
     # Print a representation of all the Nodes
-    _LOGGER.debug(repr(nodes))
+    _LOGGER.debug(repr(isy.nodes))
     _LOGGER.info("Total Loading time: %.2fs", time.time() - t_0)
 
     node_changed_subscriber = None
@@ -105,7 +105,7 @@ async def main(url, username, password, tls_ver, events, node_servers):
 
 
 if __name__ == "__main__":
-    args = None
+    #args = None
     #parser = argparse.ArgumentParser(prog=__package__)
     #parser.add_argument("http://192.168.1.204:80", type=str)
     #parser.add_argument("Panda88", type=str)
@@ -116,8 +116,8 @@ if __name__ == "__main__":
     #parser.add_argument("-n", "--node-servers", dest="node_servers", action="store_true")
     #parser.set_defaults(use_https=False, tls_ver=1.2, verbose=True)
     #args = parser.parse_args()
-    args_url = 'https://192.168.1.204:80'
-    
+    #args_url = 'https://192.168.1.204:80'
+
 
 
 
@@ -133,14 +133,24 @@ if __name__ == "__main__":
     try:
         asyncio.run(
             #main('https://192.168.1.204:8080', 'Panda88', 'coe123COE' )
+
             main(
-                url=args.url,
-                username=args.username,
-                password=args.password,
-                tls_ver=args.tls_ver,
-                events=(not args.no_events),
-                node_servers=args.node_servers,
+                'http://192.168.1.204:8080',
+                'Panda88',
+                'coe123COE',
+                1.1,
+                events=True,
+                node_servers=True,
             )
+
+            #main(
+            #    url=args.url,
+            #    username=args.username,
+            #    password=args.password,
+            #    tls_ver=args.tls_ver,
+            #    events=(not args.no_events),
+            #    node_servers=args.node_servers,
+            #)
         )
     except KeyboardInterrupt:
         _LOGGER.warning("KeyboardInterrupt received. Disconnecting!")
